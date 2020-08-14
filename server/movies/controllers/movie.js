@@ -11,6 +11,19 @@ class MovieController {
         })
     }
 
+    static findOne (req, res) {
+        const { id } = req.params
+
+        Movie.findOne(id)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).json(`Internal Server Error`)
+            console.log(err)
+        })
+    }
+
     static create(req, res) {
         const newMovie = {
             title: req.body.title,
@@ -21,8 +34,8 @@ class MovieController {
         }
 
         Movie.create(newMovie)
-        .then(result => {
-            res.status(201).json(result)
+        .then(({ops}) => {
+            res.status(201).json(ops[0])
         })
         .catch(err => {
             res.status(500).json(err.message)

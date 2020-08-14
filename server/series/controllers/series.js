@@ -12,13 +12,26 @@ class SeriesController {
         })
     }
 
+    static findOne (req, res) {
+        const { id } = req.params
+
+        Series.findOne(id)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).json(`Internal Server Error`)
+            console.log(err)
+        })
+    }
+
     static create(req, res) {
         const {title, overview, popularity, poster_path, tags} = req.body
 
         if (!title || !overview || !popularity || !poster_path || !tags.length) res.status(400).json(`Fill up whole`)
         Series.create({ title, overview, popularity, poster_path, tags})
-        .then(result => {
-            res.status(201).json(result)
+        .then(({ops}) => {
+            res.status(201).json(ops[0])
         })
         .catch(err => {
             res.status(500).json(err.message)
@@ -47,7 +60,7 @@ class SeriesController {
 
         Series.delete(id)
         .then(result => {
-            res.status(200).json(`Series successful deleted`)
+            res.status(200).json({message: `Successful delete movie`})
         })
         .catch(err => {
             console.log(err)

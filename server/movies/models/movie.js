@@ -7,6 +7,10 @@ class MovieModel {
         return Movie.find().toArray()
     }
 
+    static findOne (id) {
+        return Movie.findOne({_id: ObjectId(id)})
+    }
+
     static create (newMovie) {
         return Movie.insertOne(newMovie)
     }

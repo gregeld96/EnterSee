@@ -7,6 +7,10 @@ class SeriesModel {
         return Series.find().toArray()
     }
 
+    static findOne (id) {
+        return Series.findOne({_id: ObjectId(id)})
+    }
+
     static create(newSeries) {
         return Series.insertOne(newSeries)
     }
