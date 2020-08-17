@@ -1,0 +1,7 @@
+export {default as Home} from './Home'
+export {default as Movie} from './Movies'
+export {default as Series} from './Series'
+export {default as SerieDetail} from './SerieDetail'
+export {default as Form} from './AddForm'
+export {default as MovieDetail} from './MovieDetail'
+export {default as Favorites} from './Favorites'

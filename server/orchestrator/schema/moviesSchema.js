@@ -43,8 +43,8 @@ const typeDefs = gql`
 
     extend type Mutation {
         addMovie(movie: NewMovie) : MovieMessage
-        deleteMovie(movie: MovieId) : MovieMessage
-        updateMovie(id: MovieId, movie:UpdateMovie) : Movie
+        deleteMovie(_id: String) : MovieMessage
+        updateMovie(_id: String, movie:UpdateMovie) : Movie
     }
 `
 
@@ -76,6 +76,7 @@ const resolvers = {
             }
             try{
                 const { data }= await axios(config)
+                await redis.set('movie', data)
                 return data
             } catch (err) {
                 console.log(err.message)
@@ -94,8 +95,8 @@ const resolvers = {
                 }
                 await axios(config)
 
-                const {data} = await axios.get('http://localhost:3001/movies')
-                await redis.set('movies', JSON.stringify(data))
+                // const {data} = await axios.get('http://localhost:3001/movies')
+                await redis.del('movies')
 
                 return {message: `Success added`}
             } catch (err) {
@@ -104,7 +105,7 @@ const resolvers = {
 
         },
         deleteMovie: async (_, args) => {
-            const {_id} = args.movie
+            const {_id} = args
             try {
                 const config = {
                     method: 'DELETE',
@@ -112,8 +113,8 @@ const resolvers = {
                 }
                 await axios(config)
 
-                const {data} = await axios.get('http://localhost:3001/movies')
-                await redis.set('movies', JSON.stringify(data))
+                // const {data} = await axios.get('http://localhost:3001/movies')
+                await redis.del('movies')
 
                 return {message: `Success deleted`}
             } catch (err) {
@@ -122,7 +123,7 @@ const resolvers = {
         },
         updateMovie: async (_, args) => {
             const {title, overview, popularity, poster_path, tags} = args.movie
-            const {_id} = args.id
+            const {_id} = args
             try {
                 const payload = { title, overview, popularity, poster_path, tags }
                 const url = {
@@ -132,8 +133,8 @@ const resolvers = {
                 }
                 const {config} = await axios(url)
 
-                const {data} = await axios.get('http://localhost:3001/movies')
-                await redis.set('movies', JSON.stringify(data))
+                // const {data} = await axios.get('http://localhost:3001/movies')
+                await redis.del('movies')
 
                 return JSON.parse(config.data)
             } catch (err) {

@@ -43,8 +43,8 @@ const typeDefs = gql`
 
     extend type Mutation {
         addSeries(series: NewSeries) : SeriesMessage
-        deleteSeries(series: SeriesId) : SeriesMessage
-        updateSeries(id: SeriesId, series:UpdateSeries) : Series
+        deleteSeries(_id: String) : SeriesMessage
+        updateSeries(_id: String, series:UpdateSeries) : Series
     }
 `
 
@@ -76,6 +76,7 @@ const resolvers = {
             }
             try{
                 const { data }= await axios(config)
+                await redis.set('serie', data)
                 return data
             } catch (err) {
                 console.log(err.message)
@@ -94,8 +95,8 @@ const resolvers = {
                 }
                 await axios(config)
 
-                const {data} = await axios.get('http://localhost:3002/series')
-                await redis.set('series', JSON.stringify(data))
+                // const {data} = await axios.get('http://localhost:3002/series')
+                await redis.del('series')
 
                 return {message: `Success added`}
             } catch (err) {
@@ -103,7 +104,7 @@ const resolvers = {
             }
         },
         deleteSeries: async (_, args) => {
-            const {_id} = args.series
+            const {_id} = args
             try {
                 const config = {
                     method: 'DELETE',
@@ -111,8 +112,8 @@ const resolvers = {
                 }
                 await axios(config)
 
-                const {data} = await axios.get('http://localhost:3002/series')
-                await redis.set('series', JSON.stringify(data))
+                // const {data} = await axios.get('http://localhost:3002/series')
+                await redis.del('series')
                 return {message: `Success deleted`}
             } catch (err) {
                 console.log(err.message)
@@ -120,7 +121,7 @@ const resolvers = {
         },
         updateSeries: async (_, args) => {
             const {title, overview, popularity, poster_path, tags} = args.series
-            const {_id} = args.id
+            const {_id} = args
             try {
                 const payload = { title, overview, popularity, poster_path, tags }
                 const url = {
@@ -130,8 +131,8 @@ const resolvers = {
                 }
                 const {config} = await axios(url)
 
-                const {data} = await axios.get('http://localhost:3002/series')
-                await redis.set('series', JSON.stringify(data))
+                // const {data} = await axios.get('http://localhost:3002/series')
+                await redis.del('series')
 
                 return JSON.parse(config.data)
             } catch (err) {
