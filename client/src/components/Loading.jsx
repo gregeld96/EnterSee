@@ -2,7 +2,7 @@ import React from 'react'
 
 function Loading () {
     return (
-        <div className="lds-dual-ring"></div>
+        <div className="lds-dual-ring" />
     )
 }
 

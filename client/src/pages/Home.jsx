@@ -4,7 +4,6 @@ import List from '../components/List'
 import Loading from '../components/Loading'
 import { useLocation } from 'react-router-dom'
 import Modal from '../components/Modal'
-import { useEffect } from 'react'
 
 const GET_LIST = gql`
     query GETLIST {
