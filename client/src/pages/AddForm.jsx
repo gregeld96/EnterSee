@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react'
 import {Form, Col, Button} from 'react-bootstrap'
 import { useMutation, gql } from '@apollo/client'
 import { useHistory } from 'react-router-dom'
+import Validation from '../hooks/Validation'
+import Modal from '../components/Modal'
 
 const ADD_MOVIE = gql`
     mutation AddMovie ($newMovie: NewMovie) {
@@ -33,6 +35,7 @@ function AddForm () {
     const history = useHistory()
     const [AddSeries, {data: SeriesData}] = useMutation(ADD_SERIE)
     const [AddMovie, {data: MovieData}] = useMutation(ADD_MOVIE)
+    const [message, setMessage] = useState('')
 
     function handleGenre (event) {
         setGenre(event.target.value)
@@ -64,39 +67,49 @@ function AddForm () {
 
     function onSubmit (event) {
         event.preventDefault()
-        if(genre === 'Movie') {
-            AddMovie({
-                variables: {
-                    newMovie: input
-                }, refetchQueries: ["GETLIST"]
+        const result = Validation(input)
+
+        if(result.length > 0) {
+            let message = String(result)
+            setMessage(message)
+        } else {
+            if(genre === 'Movie') {
+                AddMovie({
+                    variables: {
+                        newMovie: input
+                    }, refetchQueries: ["GETLIST"]
+                })
+                history.push('/')
+                setInput({
+                    title: '',
+                    overview: '',
+                    poster_path: '',
+                    popularity: '',
+                    tags: []
             })
-            history.push('/')
-            setInput({
-                title: '',
-                overview: '',
-                poster_path: '',
-                popularity: '',
-                tags: []
-          })
-        } else if (genre === 'Series'){
-            AddSeries({
-                variables: {
-                    newSeries: input
-                }, refetchQueries: ["GETLIST"]
+            } else if (genre === 'Series'){
+                AddSeries({
+                    variables: {
+                        newSeries: input
+                    }, refetchQueries: ["GETLIST"]
+                })
+                history.push('/')
+                setInput({
+                    title: '',
+                    overview: '',
+                    poster_path: '',
+                    popularity: '',
+                    tags: []
             })
-            history.push('/')
-            setInput({
-                title: '',
-                overview: '',
-                poster_path: '',
-                popularity: '',
-                tags: []
-          })
+            }
         }
     }
 
     return (
         < div className="container mx-auto my-5">
+            {
+                message.length > 0 && <Modal message={message} removeMessage={() =>setMessage('')}/>
+            }
             <Form>
                 <Form.Row className="my-3">
                     <Col>
@@ -117,7 +130,7 @@ function AddForm () {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Overview</Form.Label>
-                    <textarea className="TextArea" name="overview" type="text" defaultValue={input.overview} placeholder="Description here..." onChange={onChange} />
+                    <Form.Control as="textarea" style={{height: '200px'}} name="overview" type="text" defaultValue={input.overview} placeholder="Description here..." onChange={onChange} />
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Poster Url</Form.Label>

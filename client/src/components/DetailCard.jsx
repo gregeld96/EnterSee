@@ -6,8 +6,8 @@ function DetailCard ({input}) {
     return (
         <>
             <div className="d-flex container">
-                <h3 className="px-1 my-auto">{input.title}</h3>
-                <Rating className="my-auto ml-auto"
+                <h5 className="px-1 m-5 mx-auto">{input.title}</h5>
+                <h5 className="my-auto ml-auto" style={{width: '200px'}}>{input.popularity} <Rating
                     start={0}
                     stop={5}
                     step={1}
@@ -15,7 +15,7 @@ function DetailCard ({input}) {
                     emptySymbol="far fa-star fa-1x"
                     fullSymbol="fa fa-star fa-1x"
                     initialRating={(input.popularity/2)}
-                />
+                /></h5>
             </div>
             <p className="p-3">{input.overview}</p>
             <div className="d-flex container">

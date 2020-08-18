@@ -5,6 +5,8 @@ import { useQuery, gql, useMutation } from '@apollo/client'
 import DetailCard from '../components/DetailCard'
 import Loading from '../components/Loading'
 import client, { GET_FAV_ANIME } from '../config/config'
+import Validation from '../hooks/Validation'
+import Modal from '../components/Modal'
 
 const GET_MOVIE = gql`
     query GETMOVIE($id: ID!) {
@@ -60,6 +62,7 @@ function MovieDetail () {
         tags: []
     })
     const { data:favs } = useQuery(GET_FAV_ANIME)
+    const [message, setMessage] = useState('')
 
     function handleDelete (id) {
         deleteMovie({
@@ -67,7 +70,10 @@ function MovieDetail () {
                 id: id
             }, refetchQueries: ['GETLIST']
         })
-        history.push('/')
+        history.push({
+            pathname: '/',
+            state: 'Data deleted'
+        })
     }
 
     useEffect(() => {
@@ -81,7 +87,7 @@ function MovieDetail () {
             })
             setTags(data.movie.tags)
         }
-    }, [show])
+    }, [data])
 
     useEffect(() => {
         setEdit({
@@ -125,20 +131,20 @@ function MovieDetail () {
 
     function onSubmit (event) {
         event.preventDefault()
-        editMovie({
-            variables: {
-                id: id,
-                editMovie: edit
-            }, refetchQueries: ['GETMOVIE']
-        })
-        setEdit({
-            title: '',
-            overview: '',
-            poster_path: '',
-            popularity: '',
-            tags: []
-        })
-        setShown(false)
+        const result = Validation(edit)
+
+        if(result.length > 0) {
+            let message = String(result)
+            setMessage(message)
+        } else {
+            editMovie({
+                variables: {
+                    id: id,
+                    editMovie: edit
+                }, refetchQueries: ['GETMOVIE']
+            })
+            setShown(false)
+        }
     }
 
     function handleFavorite (newAnime) {
@@ -165,17 +171,20 @@ function MovieDetail () {
     else {
         return (
           <>
+            {
+                message.length > 0 && <Modal message={message} removeMessage={() =>setMessage('')}/>
+            }
             <div className="d-flex text-center container mx-auto my-5 border">
                 <div className="my-auto">
                     <Image src={data.movie.poster_path}/>
                 </div>
                 <div className="m-3 my-auto">
                     <DetailCard input={data.movie} />
-                    <div className="d-flex">
-                        <Button onClick={() => handleDelete(id)}>Delete</Button>
-                        <Button onClick={() => handleEdit()}>Edit</Button>
+                    <div className="d-flex justify-content-center mt-3">
+                        <Button size="sm" className="m-2" onClick={() => handleDelete(id)}>Delete</Button>
+                        <Button size="sm" className="m-2" onClick={() => handleEdit()}>Edit</Button>
                         {
-                          !disabled.length && <Button onClick={() => handleFavorite(data.movie)}>Favorite</Button>
+                          !disabled.length && <Button size="sm" className="m-2" onClick={() => handleFavorite(data.movie)}>Favorite</Button>
                         }
                     </div>
                 </div>
@@ -195,7 +204,7 @@ function MovieDetail () {
                      </Form.Row>
                      <Form.Group>
                          <Form.Label>Overview</Form.Label><br />
-                         <textarea className="TextArea" name="overview" type="text" defaultValue={edit.overview} placeholder="Description here..." onChange={onChange} />
+                         <Form.Control as="textarea" style={{height: '200px'}} name="overview" type="text" defaultValue={edit.overview} placeholder="Description here..." onChange={onChange} />
                      </Form.Group>
                      <Form.Group>
                          <Form.Label>Poster Url</Form.Label>

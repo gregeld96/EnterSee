@@ -5,6 +5,8 @@ import { useQuery, gql, useMutation } from '@apollo/client'
 import Loading from '../components/Loading'
 import DetailCard from '../components/DetailCard'
 import client, { GET_FAV_ANIME } from '../config/config'
+import Validation from '../hooks/Validation'
+import Modal from '../components/Modal'
 
 const GET_SERIE = gql`
     query GETSERIE($id: ID!) {
@@ -60,6 +62,7 @@ function Detail () {
         tags: []
     })
     const { data:favs } = useQuery(GET_FAV_ANIME)
+    const [message, setMessage] = useState('')
 
     function handleDelete (id) {
         deleteSeries({
@@ -67,7 +70,10 @@ function Detail () {
                 id: id
             }, refetchQueries: ['GETLIST']
         })
-        history.push('/')
+        history.push({
+            pathname: '/',
+            state: 'Data deleted'
+        })
     }
 
     useEffect(() => {
@@ -81,7 +87,7 @@ function Detail () {
             })
             setTags(data.serie.tags)
         }
-    }, [show])
+    }, [data])
 
     useEffect(() => {
         setEdit({
@@ -125,21 +131,20 @@ function Detail () {
 
     function onSubmit (event) {
         event.preventDefault()
-        editSeries({
-            variables: {
-                id: id,
-                editSeries: edit
-            }, refetchQueries: ['GETSERIE']
-        })
-        setEdit({
-            title: '',
-            overview: '',
-            poster_path: '',
-            popularity: '',
-            tags: []
-        })
-        setShown(false)
-        console.log(edit)
+        const result = Validation(edit)
+
+        if(result.length > 0) {
+            let message = String(result)
+            setMessage(message)
+        } else {
+            editSeries({
+                variables: {
+                    id: id,
+                    editSeries: edit
+                }, refetchQueries: ['GETSERIE']
+            })
+            setShown(false)
+        }
     }
 
     function handleFavorite (newAnime) {
@@ -166,17 +171,20 @@ function Detail () {
     else {
         return (
             <>
+                {
+                    message.length > 0 && <Modal message={message} removeMessage={() =>setMessage('')}/>
+                }
                 <div className="d-flex text-center container mx-auto my-5 border">
-                    <div>
+                    <div className="my-auto">
                         <Image src={data.serie.poster_path}/>
                     </div>
                     <div className="m-3">
                         <DetailCard input={data.serie} />
-                        <div className="d-flex container">
-                            <Button onClick={() => handleDelete(id)}>Delete</Button>
-                            <Button onClick={() => handleEdit()}>Edit</Button>
+                        <div className="d-flex justify-content-center mt-3">
+                            <Button size="sm" className="m-2" onClick={() => handleDelete(id)}>Delete</Button>
+                            <Button size="sm" className="m-2" onClick={() => handleEdit()}>Edit</Button>
                             {
-                                !disabled.length && <Button onClick={() => handleFavorite(data.serie)}>Favorite</Button>
+                                !disabled.length && <Button size="sm" className="m-2" onClick={() => handleFavorite(data.serie)}>Favorite</Button>
                             }
                         </div>
                     </div>
@@ -196,7 +204,7 @@ function Detail () {
                         </Form.Row>
                         <Form.Group>
                             <Form.Label>Overview</Form.Label><br />
-                            <textarea className="TextArea" name="overview" type="text" defaultValue={edit.overview} placeholder="Description here..." onChange={onChange} />
+                            <Form.Control as="textarea" style={{height: '200px'}} name="overview" type="text" defaultValue={edit.overview} placeholder="Description here..." onChange={onChange} />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Poster Url</Form.Label>

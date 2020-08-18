@@ -23,7 +23,7 @@ function Navigation () {
         <>
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
                 <div className="container">
-                    <Navbar.Brand onClick={() => toPage('home')}>ENTERTAIN ME</Navbar.Brand>
+                    <Navbar.Brand style={{cursor: 'pointer'}} onClick={() => toPage('home')}>ENTERTAIN ME</Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav >
