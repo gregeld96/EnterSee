@@ -1,22 +1,14 @@
-## Week-2 Day 4
+## ENTERSEE
+> This is an app to see a list of movie where the user could do CRUD on it, this app was created using Apollo GrapQL technology where React was used as the front end framework and MongoDB was the RDMS.
 
-- Challenge Pagi
-  - kerjakan di folder `server/express`
-- SIANG: 
-  - pisahkan app yang kalian buat tadi pagi menjadi arsitektur microservice:
-  - orchestrator: kerjakan di folder `server/orchestrator` berupa aplikasi express.js PORT 5000
-  - service movies: kerjakan di folder `server/movies` berupa aplikasi express.js PORT 5001
-  - service series: kerjakan di folder `server/series berupa aplikasi express.js PORT 5002
+- Backend Technology:
+  - Node JS
+  - MongoDB
+  - Redis
+  - GraphQL
+  - Apollo Server
 
-## Week-2 Day 5
-
-- Challenge Pagi:
-  - kerjakan di folder `server/orchestrator`, aplikasi berupa apollo server (atau digabung dengan express) PORT 5000
-  - kerjakan di folder `server/movies`, aplikasi berupa express PORT 5001
-  - kerjakan di folder `server/series`, aplikasi berupa express PORT 5002
-- Challenge Siang:
-  - kerjakan di folder `client`, aplikasi berupa react + apollo client 
-
-## Week-3 Day 1
-
-- lanjut kerjakan di folder `client`
+- Frontend Technology:
+  - React JS
+  - Redux
+  - Apollo Client
